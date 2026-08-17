@@ -6,7 +6,6 @@ import { ArrowRight } from "lucide-react";
 import styles from "./thankyou.module.css";
 import SiteFooter from "./SiteFooter";
 import {
-  CONFIG,
   WEBINAR_PATH,
   formattedWebinarDateLong,
   formattedWebinarTime,
@@ -18,10 +17,11 @@ import {
   trackAddToCalendar,
   trackCtaClick,
   trackRegistrationComplete,
+  setWebinarSlug,
 } from "./tracking";
 
 // ── Calendar ──────────────────────────────────────────────────────────────
-// Built in the browser from CONFIG, so there is no server round trip and the
+// Built in the browser from the session, so there is no server round trip and the
 // file can never disagree with what the page displays.
 
 function icsStamp(date) {
@@ -32,9 +32,9 @@ function escapeIcsText(value) {
   return String(value).replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n");
 }
 
-function buildIcs() {
-  const start = webinarStartDate();
-  const end = webinarEndDate();
+function buildIcs(session) {
+  const start = webinarStartDate(session);
+  const end = webinarEndDate(session);
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -42,14 +42,14 @@ function buildIcs() {
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",
-    `UID:${CONFIG.webinar}-${icsStamp(start)}@zeminent.com`,
+    `UID:${session.webinar}-${icsStamp(start)}@zeminent.com`,
     `DTSTAMP:${icsStamp(start)}`,
     `DTSTART:${icsStamp(start)}`,
     `DTEND:${icsStamp(end)}`,
-    `SUMMARY:${escapeIcsText(`${CONFIG.title} — Zeminent`)}`,
-    `DESCRIPTION:${escapeIcsText(`${CONFIG.subtitle}\nJoin: ${CONFIG.webinarUrl}`)}`,
-    `URL:${CONFIG.webinarUrl}`,
-    `LOCATION:${escapeIcsText(CONFIG.location)}`,
+    `SUMMARY:${escapeIcsText(`${session.title} — Zeminent`)}`,
+    `DESCRIPTION:${escapeIcsText(`${session.subtitle}\nJoin: ${session.webinarUrl}`)}`,
+    `URL:${session.webinarUrl}`,
+    `LOCATION:${escapeIcsText(session.location)}`,
     // Two reminders, mirroring the Zoho Webinar email cadence.
     "BEGIN:VALARM",
     "TRIGGER:-PT24H",
@@ -66,20 +66,20 @@ function buildIcs() {
   ].join("\r\n");
 }
 
-// A data: URI rather than a Blob URL — the file derives only from CONFIG, so
+// A data: URI rather than a Blob URL — the file derives only from the session, so
 // it can be built during render with no effect, no state and no object-URL
 // lifecycle. Paired with `download`, browsers save it as a file.
-function icsHref() {
-  return `data:text/calendar;charset=utf-8,${encodeURIComponent(buildIcs())}`;
+function icsHref(session) {
+  return `data:text/calendar;charset=utf-8,${encodeURIComponent(buildIcs(session))}`;
 }
 
-function googleCalendarUrl() {
+function googleCalendarUrl(session) {
   const params = new URLSearchParams({
     action: "TEMPLATE",
-    text: `${CONFIG.title} — Zeminent`,
-    dates: `${icsStamp(webinarStartDate())}/${icsStamp(webinarEndDate())}`,
-    details: `${CONFIG.subtitle}\n\nJoin: ${CONFIG.webinarUrl}`,
-    location: CONFIG.location,
+    text: `${session.title} — Zeminent`,
+    dates: `${icsStamp(webinarStartDate(session))}/${icsStamp(webinarEndDate(session))}`,
+    details: `${session.subtitle}\n\nJoin: ${session.webinarUrl}`,
+    location: session.location,
   });
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
@@ -90,7 +90,7 @@ const STEPS = [
   "Bring one question about where you're stuck. We answer them live at the end.",
 ];
 
-export default function ThankYouClient() {
+export default function ThankYouClient({ session }) {
   // Zoho redirects the registration modal's iframe here on submit, so this
   // page can mount inside the modal rather than as a page in its own right.
   //
@@ -109,9 +109,10 @@ export default function ThankYouClient() {
     }
     // Attribution is re-read from sessionStorage first, so the conversion
     // carries the same utm_* / cta_location the landing page recorded.
+    setWebinarSlug(session?.slug);
     captureAttribution();
     trackRegistrationComplete();
-  }, []);
+  }, [session?.slug]);
 
   return (
     <div className={styles.page}>
@@ -149,30 +150,37 @@ export default function ThankYouClient() {
             session to your calendar now so it doesn&rsquo;t get buried.
           </p>
 
+          {/* Details only when there is a session to describe. Someone can
+              land here after the session was unpublished or rolled over; the
+              registration is still real, so confirm it and skip the panel
+              rather than printing blanks. */}
+          {session ? (
           <section className={styles.panel} aria-label="Session details">
             <div className={styles.row}>
               <span className={styles.rowKey}>Workshop</span>
-              <span className={styles.rowVal}>{CONFIG.title}</span>
+              <span className={styles.rowVal}>{session.title}</span>
             </div>
             <div className={styles.row}>
               <span className={styles.rowKey}>Date</span>
-              <span className={styles.rowVal}>{formattedWebinarDateLong()}</span>
+              <span className={styles.rowVal}>{formattedWebinarDateLong(session)}</span>
             </div>
             <div className={styles.row}>
               <span className={styles.rowKey}>Time</span>
-              <span className={styles.rowVal}>{formattedWebinarTime()}</span>
+              <span className={styles.rowVal}>{formattedWebinarTime(session)}</span>
             </div>
             <div className={styles.row}>
               <span className={styles.rowKey}>Where</span>
               <span className={`${styles.rowVal} ${styles.rowValAccent}`}>
-                {CONFIG.location}
+                {session.location}
               </span>
             </div>
           </section>
+          ) : null}
 
+          {session ? (
           <div className={styles.actions}>
             <a
-              href={googleCalendarUrl()}
+              href={googleCalendarUrl(session)}
               target="_blank"
               rel="noopener noreferrer"
               className={styles.btnPrimary}
@@ -182,9 +190,9 @@ export default function ThankYouClient() {
               <ArrowRight size={16} className={styles.arrow} aria-hidden="true" />
             </a>
 
-            {/* CONFIG.webinarUrl — the Zoho Webinar session joining URL. */}
+            {/* session.webinarUrl — the Zoho Webinar session joining URL. */}
             <a
-              href={CONFIG.webinarUrl}
+              href={session.webinarUrl}
               target="_blank"
               rel="noopener noreferrer"
               className={styles.btnGhost}
@@ -195,17 +203,20 @@ export default function ThankYouClient() {
               Open the webinar page
             </a>
           </div>
+          ) : null}
 
+          {session ? (
           <p className={styles.icsLink}>
             On Outlook or Apple Calendar?{" "}
             <a
-              href={icsHref()}
-              download={`zeminent-${CONFIG.webinar}.ics`}
+              href={icsHref(session)}
+              download={`zeminent-${session.webinar}.ics`}
               onClick={trackAddToCalendar}
             >
               Download the .ics file
             </a>
           </p>
+          ) : null}
 
           <hr className={styles.divider} />
 

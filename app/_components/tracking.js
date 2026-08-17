@@ -18,7 +18,15 @@
 // missing/placeholder Measurement ID degrades to "page works, nothing
 // reported" rather than a runtime error.
 
-import { CONFIG } from "./config";
+// The slug that stamps every GA4 event, so reports can be sliced per session.
+// Set once by whichever page mounted, rather than imported from config —
+// sessions come from the admin panel now, so there is no compile-time value.
+let webinarSlug = "";
+
+/** Called by each page as soon as it knows which session it is rendering. */
+export function setWebinarSlug(slug) {
+  if (slug) webinarSlug = slug;
+}
 
 const STORAGE_KEY = "zem_webinar_attribution";
 
@@ -153,7 +161,7 @@ function attributionParams() {
 
 export function trackEvent(name, params = {}) {
   gtag("event", name, {
-    webinar: CONFIG.webinar,
+    ...(webinarSlug ? { webinar: webinarSlug } : {}),
     ...attributionParams(),
     ...params,
   });

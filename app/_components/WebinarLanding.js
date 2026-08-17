@@ -7,7 +7,7 @@ import RegistrationModal from "./RegistrationModal";
 import { SectionLabel, WebinarTopBar } from "./WebinarChrome";
 import SiteFooter from "./SiteFooter";
 import {
-  CONFIG,
+  PAGE,
   formattedWebinarDate,
   formattedWebinarTime,
   webinarStartDate,
@@ -15,6 +15,7 @@ import {
 import {
   captureAttribution,
   initScrollDepthTracking,
+  setWebinarSlug,
   trackCtaClick,
   trackViewWebinarLanding,
 } from "./tracking";
@@ -30,22 +31,22 @@ const pad2 = (n) => String(n).padStart(2, "0");
 const index2 = (i) => pad2(i + 1);
 
 /**
- * Live countdown to CONFIG.webinarStart.
+ * Live countdown to the session's start time.
  *
  * Mounted-gated: the server has no idea what "now" is for this visitor, so
  * rendering a duration during SSR guarantees a hydration mismatch. Renders
  * nothing until the first client tick.
  */
-function Countdown() {
+function Countdown({ session }) {
   const [remaining, setRemaining] = useState(null);
 
   useEffect(() => {
-    const target = webinarStartDate().getTime();
+    const target = webinarStartDate(session).getTime();
     const tick = () => setRemaining(Math.max(0, target - Date.now()));
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [session]);
 
   if (remaining === null) return null;
 
@@ -80,7 +81,7 @@ function Countdown() {
   );
 }
 
-export default function WebinarLanding() {
+export default function WebinarLanding({ session }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [ctaLocation, setCtaLocation] = useState("hero");
   const [seatBarVisible, setSeatBarVisible] = useState(false);
@@ -89,10 +90,11 @@ export default function WebinarLanding() {
   // Attribution first, then the landing event — so utm_* are already in
   // sessionStorage when view_webinar_landing fires and carry into the payload.
   useEffect(() => {
+    setWebinarSlug(session.slug);
     captureAttribution();
     trackViewWebinarLanding();
     return initScrollDepthTracking();
-  }, []);
+  }, [session.slug]);
 
   // The seat bar appears once the hero CTA is off screen, so the primary
   // action is always reachable without duplicating it while it is visible.
@@ -115,9 +117,26 @@ export default function WebinarLanding() {
 
   const closeRegistration = useCallback(() => setModalOpen(false), []);
 
-  const date = formattedWebinarDate();
-  const time = formattedWebinarTime();
-  const hasTestimonials = CONFIG.testimonials.length > 0;
+  const date = formattedWebinarDate(session);
+  const time = formattedWebinarTime(session);
+  const hasTestimonials = (session?.testimonials?.length || 0) > 0;
+  const instructor = session.instructor || null;
+  const hasInstructor = Boolean(instructor?.name);
+  const instructorFacts = instructor?.facts || [];
+
+  // Eyebrow numbers are derived, not hardcoded: an admin leaving the
+  // instructor blank hides that section, and a hardcoded "06" after a missing
+  // "05" looks like a bug to anyone reading the page.
+  const sections = [
+    "why",
+    "roadmap",
+    "stack",
+    "audience",
+    hasInstructor ? "instructor" : null,
+    "takeaways",
+    hasTestimonials ? "testimonials" : null,
+  ].filter(Boolean);
+  const sectionNo = (key) => pad2(sections.indexOf(key) + 1);
 
   return (
     <div className={styles.page}>
@@ -177,7 +196,7 @@ export default function WebinarLanding() {
             </div>
 
             <p className={styles.heroNote}>
-              {CONFIG.priceLabel} &middot; no recording guarantee &middot; joining
+              {session.priceLabel} &middot; no recording guarantee &middot; joining
               link emailed instantly
             </p>
           </div>
@@ -197,7 +216,7 @@ export default function WebinarLanding() {
             <div className={styles.sessionBody}>
               <div className={styles.sessionRow}>
                 <span className={styles.sessionKey}>Topic</span>
-                <span className={styles.sessionVal}>{CONFIG.title}</span>
+                <span className={styles.sessionVal}>{session.title}</span>
               </div>
               <div className={styles.sessionRow}>
                 <span className={styles.sessionKey}>Date</span>
@@ -210,13 +229,13 @@ export default function WebinarLanding() {
               <div className={styles.sessionRow}>
                 <span className={styles.sessionKey}>Duration</span>
                 <span className={styles.sessionVal}>
-                  {CONFIG.webinarDurationMinutes} minutes
+                  {session.webinarDurationMinutes} minutes
                 </span>
               </div>
               <div className={styles.sessionRow}>
                 <span className={styles.sessionKey}>Price</span>
                 <span className={styles.sessionValAccent}>
-                  {CONFIG.priceLabel}
+                  {session.priceLabel}
                 </span>
               </div>
               <div className={styles.sessionRow}>
@@ -226,7 +245,7 @@ export default function WebinarLanding() {
             </div>
 
             <div className={styles.sessionFoot}>
-              <Countdown />
+              <Countdown session={session} />
               <button
                 type="button"
                 className={`${styles.btnPrimary} ${styles.sessionCta}`}
@@ -242,7 +261,7 @@ export default function WebinarLanding() {
 
             <div className={styles.sessionStatus}>
               <span>registration open</span>
-              <span>{CONFIG.seatCap} seats</span>
+              <span>{session.seatCap} seats</span>
             </div>
           </aside>
         </div>
@@ -251,7 +270,7 @@ export default function WebinarLanding() {
       {/* ── Why this exists ──────────────────────────────────────────── */}
       <section className={styles.section}>
         <div className={styles.shell}>
-          <SectionLabel num="01" label="Why this session" />
+          <SectionLabel num={sectionNo("why")} label="Why this session" />
 
           <h2 className={`${styles.display} ${styles.sectionHeading}`}>
             The problem was never
@@ -281,9 +300,9 @@ export default function WebinarLanding() {
 
           <div className={styles.statStrip}>
             {[
-              { n: CONFIG.webinarDurationMinutes, l: "minutes, live" },
+              { n: session.webinarDurationMinutes, l: "minutes, live" },
               { n: ROADMAP.length, l: "roadmap stages" },
-              { n: CONFIG.priceLabel, l: "to attend" },
+              { n: session.priceLabel, l: "to attend" },
               { n: "Q&A", l: "at the end" },
             ].map((s, i) => (
               <div
@@ -301,7 +320,7 @@ export default function WebinarLanding() {
       {/* ── The roadmap ──────────────────────────────────────────────── */}
       <section className={styles.section} id="roadmap">
         <div className={styles.shell}>
-          <SectionLabel num="02" label="The roadmap" />
+          <SectionLabel num={sectionNo("roadmap")} label="The roadmap" />
 
           <h2 className={`${styles.display} ${styles.sectionHeading}`}>
             Seven stages.
@@ -335,7 +354,7 @@ export default function WebinarLanding() {
       {/* ── The stack ────────────────────────────────────────────────── */}
       <section className={styles.section}>
         <div className={styles.shell}>
-          <SectionLabel num="03" label="The stack" />
+          <SectionLabel num={sectionNo("stack")} label="The stack" />
 
           <h2 className={`${styles.display} ${styles.sectionHeading}`}>
             What the roadmap
@@ -363,7 +382,7 @@ export default function WebinarLanding() {
       {/* ── Who it's for ─────────────────────────────────────────────── */}
       <section className={styles.section}>
         <div className={styles.shell}>
-          <SectionLabel num="04" label="Who it's for" />
+          <SectionLabel num={sectionNo("audience")} label="Who it's for" />
 
           <h2 className={`${styles.display} ${styles.sectionHeading}`}>
             Built for one person
@@ -403,10 +422,11 @@ export default function WebinarLanding() {
         </div>
       </section>
 
-      {/* ── Instructor ───────────────────────────────────────────────── */}
+      {/* ── Instructor — only when an admin filled one in ────────────── */}
+      {hasInstructor && (
       <section className={styles.section}>
         <div className={styles.shell}>
-          <SectionLabel num="05" label="Your instructor" />
+          <SectionLabel num={sectionNo("instructor")} label="Your instructor" />
 
           <h2 className={`${styles.display} ${styles.sectionHeading}`}>
             Taught by the person
@@ -416,25 +436,42 @@ export default function WebinarLanding() {
 
           <div className={styles.instructor}>
             <div className={styles.instructorPhotoWrap}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={CONFIG.instructor.photo}
-                alt={CONFIG.instructor.name}
-                className={styles.instructorPhoto}
-                width={800}
-                height={800}
-                loading="lazy"
-              />
+              {/* An empty src makes the browser re-request the page itself, so
+                  render initials instead of an <img> when no photo is set —
+                  the same fallback the learner site's instructor cards use. */}
+              {instructor.photo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={instructor.photo}
+                  alt={instructor.name}
+                  className={styles.instructorPhoto}
+                  width={800}
+                  height={800}
+                  loading="lazy"
+                />
+              ) : (
+                <span className={styles.instructorInitials} aria-hidden="true">
+                  {instructor.name
+                    .split(" ")
+                    .map((part) => part[0])
+                    .filter(Boolean)
+                    .join("")
+                    .toUpperCase()
+                    .slice(0, 2)}
+                </span>
+              )}
             </div>
 
             <div>
-              <h3 className={styles.instructorName}>{CONFIG.instructor.name}</h3>
-              <div className={styles.instructorRole}>
-                {CONFIG.instructor.role}
-              </div>
-              <p className={styles.instructorBio}>{CONFIG.instructor.bio}</p>
+              <h3 className={styles.instructorName}>{instructor.name}</h3>
+              {instructor.role ? (
+                <div className={styles.instructorRole}>{instructor.role}</div>
+              ) : null}
+              {instructor.bio ? (
+                <p className={styles.instructorBio}>{instructor.bio}</p>
+              ) : null}
               <ul className={styles.instructorFacts}>
-                {CONFIG.instructor.facts.map((fact) => (
+                {instructorFacts.map((fact) => (
                   <li key={fact} className={styles.instructorFact}>
                     <Check size={15} className={styles.audienceIcon} aria-hidden="true" />
                     <span>{fact}</span>
@@ -445,11 +482,12 @@ export default function WebinarLanding() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── What you leave with ──────────────────────────────────────── */}
       <section className={styles.section}>
         <div className={styles.shell}>
-          <SectionLabel num="06" label="What you leave with" />
+          <SectionLabel num={sectionNo("takeaways")} label="What you leave with" />
 
           <h2 className={`${styles.display} ${styles.sectionHeading}`}>
             Ninety minutes in,
@@ -474,7 +512,7 @@ export default function WebinarLanding() {
       {hasTestimonials && (
         <section className={styles.section}>
           <div className={styles.shell}>
-            <SectionLabel num="07" label="From students" />
+            <SectionLabel num={sectionNo("testimonials")} label="From students" />
 
             <h2 className={`${styles.display} ${styles.sectionHeading}`}>
               What they said
@@ -482,7 +520,7 @@ export default function WebinarLanding() {
             </h2>
 
             <div className={styles.quoteList}>
-              {CONFIG.testimonials.map((t) => (
+              {session.testimonials.map((t) => (
                 <figure key={`${t.name}-${t.role}`} className={styles.quote}>
                   <div className={styles.quoteAvatar} aria-hidden="true">
                     {t.name[0]}
@@ -518,7 +556,7 @@ export default function WebinarLanding() {
           </h2>
 
           <p className={styles.finalLede}>
-            {CONFIG.seatCap} seats, one session, no cost. The joining link is
+            {session.seatCap} seats, one session, no cost. The joining link is
             emailed the moment you register.
           </p>
 
@@ -554,9 +592,9 @@ export default function WebinarLanding() {
       >
         <div className={styles.seatBarInner}>
           <div className={styles.seatBarCopy}>
-            <div className={styles.seatBarTitle}>{CONFIG.title}</div>
+            <div className={styles.seatBarTitle}>{session.title}</div>
             <div className={styles.seatBarMeta}>
-              {date} &middot; {time} &middot; {CONFIG.priceLabel}
+              {date} &middot; {time} &middot; {session.priceLabel}
             </div>
           </div>
           <button
@@ -575,6 +613,7 @@ export default function WebinarLanding() {
           visitor asks for it and its state resets cleanly on every open. */}
       {modalOpen && (
         <RegistrationModal
+          session={session}
           ctaLocation={ctaLocation}
           onClose={closeRegistration}
         />

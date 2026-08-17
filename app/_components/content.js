@@ -2,7 +2,7 @@
 //
 // Kept out of the component so the wording can be reviewed and edited without
 // reading JSX. Nothing here is a claim about outcomes or a student quote —
-// testimonials live in CONFIG.testimonials and are real-students-only.
+// testimonials come from the admin panel and are real-students-only.
 
 // Seven stages → the `01 / 07` numbered hairline grid the homepage uses for
 // its capability cards.

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import styles from "./webinar.module.css";
-import { CONFIG, formattedWebinarDate, formattedWebinarTime } from "./config";
+import { formattedWebinarDate, formattedWebinarTime } from "./config";
 import { buildZohoFormUrl, trackRegistrationFormOpen } from "./tracking";
 
 /**
@@ -11,13 +11,13 @@ import { buildZohoFormUrl, trackRegistrationFormOpen } from "./tracking";
  *
  * The form itself is the single write point for the whole funnel (CRM lead,
  * webinar registrant, sheet row all subscribe to it), so nothing here posts
- * anywhere: the iframe src is CONFIG.zohoFormUrl with the captured
+ * anywhere: the iframe src is the session's zohoFormUrl with the captured
  * attribution appended as query params, which is how Zoho prefills its hidden
  * fields. On submit Zoho redirects the iframe to the thank-you page; the
  * `top-redirect` handling below promotes that to a full-page navigation so the
  * visitor doesn't end up with the thank-you page rendered inside a modal.
  */
-export default function RegistrationModal({ ctaLocation, onClose }) {
+export default function RegistrationModal({ session, ctaLocation, onClose }) {
   const [loaded, setLoaded] = useState(false);
   const dialogRef = useRef(null);
   const closeRef = useRef(null);
@@ -28,7 +28,7 @@ export default function RegistrationModal({ ctaLocation, onClose }) {
   // than on every render because cta_location differs per button and the
   // attribution record was just updated by the click that opened this.
   const [src] = useState(() =>
-    buildZohoFormUrl(CONFIG.zohoFormUrl, ctaLocation),
+    buildZohoFormUrl(session.zohoFormUrl, ctaLocation),
   );
 
   useEffect(() => {
@@ -110,7 +110,7 @@ export default function RegistrationModal({ ctaLocation, onClose }) {
               Reserve your free seat
             </h2>
             <div className={styles.modalMeta}>
-              {formattedWebinarDate()} &middot; {formattedWebinarTime()}
+              {formattedWebinarDate(session)} &middot; {formattedWebinarTime(session)}
             </div>
           </div>
           <button

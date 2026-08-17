@@ -1,23 +1,23 @@
 import { ImageResponse } from "next/og";
 import {
-  CONFIG,
   formattedWebinarDate,
   formattedWebinarTime,
 } from "./_components/config";
+import { getSession } from "./_components/getWebinar";
 
 // Social card, generated at build time rather than shipped as a binary.
 //
 // The metadata used to point at a static og-full-stack-roadmap.jpg, which was
 // never created — so every share preview requested a 404. A file convention
 // route means Next wires the correct absolute URL into both the Open Graph and
-// Twitter tags itself, and the card can never drift from CONFIG the way a
+// Twitter tags itself, and the card can never drift from the session data the way a
 // hand-exported JPEG would.
 //
 // Kept to system fonts on purpose: ImageResponse cannot read the next/font
 // files, and fetching Geist at build time would make the build depend on the
 // network. The brand comes through in the colour and composition instead.
 
-export const alt = CONFIG.title;
+export const alt = "Zeminent webinar";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -27,7 +27,13 @@ const DIM = "#a8b0bb";
 const MUTE = "#6b7280";
 const ACCENT = "#5eead4";
 
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  const session = await getSession();
+
+  // No published session: a generic brand card. Better a plain card than one
+  // announcing a date that does not exist, since social previews get cached
+  // by every platform that scrapes them.
+
   return new ImageResponse(
     (
       <div
@@ -71,13 +77,13 @@ export default function OpengraphImage() {
               color: MUTE,
             }}
           >
-            Zeminent · Free live webinar
+            {session ? "Zeminent · Free live webinar" : "Zeminent · Webinars"}
           </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 82, lineHeight: 1.05, letterSpacing: -2 }}>
-            Become a job-ready
+            {session ? "Become a job-ready" : "Free live sessions"}
           </div>
           <div
             style={{
@@ -88,7 +94,7 @@ export default function OpengraphImage() {
               color: ACCENT,
             }}
           >
-            full stack developer.
+            {session ? "full stack developer." : "for future engineers."}
           </div>
           {/* Single interpolated string, not text-beside-expression: Satori
               rejects any element with more than one child unless it declares
@@ -102,7 +108,9 @@ export default function OpengraphImage() {
               maxWidth: 900,
             }}
           >
-            {`${CONFIG.webinarDurationMinutes} minutes on exactly what to learn, in what order, and what to skip.`}
+            {session
+              ? `${session.durationMinutes} minutes on exactly what to learn, in what order, and what to skip.`
+              : "Announcements appear here as soon as the next session is scheduled."}
           </div>
         </div>
 
@@ -118,10 +126,10 @@ export default function OpengraphImage() {
           }}
         >
           <div style={{ display: "flex" }}>
-            {`${formattedWebinarDate()} · ${formattedWebinarTime()}`}
+            {session ? `${formattedWebinarDate(session)} · ${formattedWebinarTime(session)}` : "webinar.zeminent.com"}
           </div>
           <div style={{ display: "flex", color: ACCENT }}>
-            {CONFIG.priceLabel}
+            {session ? session.priceLabel : ""}
           </div>
         </div>
       </div>

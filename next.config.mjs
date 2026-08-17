@@ -42,6 +42,17 @@ const nextConfig = {
   async headers() {
     const isDev = process.env.NODE_ENV === 'development';
 
+    // Instructor photos are served by the API, so its origin has to be allowed
+    // in img-src or the browser blocks them — the page would show a broken
+    // image with only a console warning to explain it. Derived from the same
+    // env var the server-side fetch uses, so there is one value to change.
+    let apiOrigin = '';
+    try {
+      apiOrigin = new URL(process.env.API_URL || 'http://localhost:4000/api').origin;
+    } catch {
+      apiOrigin = '';
+    }
+
     // Next's dev server needs three things this policy would otherwise block,
     // all of which must stay out of the production policy:
     //   - eval, for the HMR runtime;
@@ -69,7 +80,9 @@ const nextConfig = {
               "frame-src 'self' https://forms.zohopublic.in https://*.zoho.in https://*.zoho.com https://*.zohowebinar.in",
               `script-src 'self' 'unsafe-inline'${devScript} https://www.googletagmanager.com`,
               `connect-src 'self'${devConnect} https://www.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com`,
-              "img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com",
+              `img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com${
+                apiOrigin ? ` ${apiOrigin}` : ''
+              }`,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' data: https://fonts.gstatic.com",
             ].join('; '),

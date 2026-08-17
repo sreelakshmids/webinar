@@ -789,6 +789,21 @@
   display: block;
 }
 
+/* Shown when no photo is set. Same gentle initials treatment the learner
+   site's instructor cards fall back to, rather than an empty frame. */
+.instructorInitials {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--wb-serif);
+  font-size: clamp(48px, 9vw, 84px);
+  letter-spacing: -0.03em;
+  color: var(--wb-fg-mute);
+  background: linear-gradient(135deg, var(--wb-bg-2), var(--wb-bg-3));
+}
+
 .instructorName {
   font-family: var(--wb-serif);
   font-size: 40px;

@@ -4,7 +4,9 @@
   "private": true,
   "description": "Zeminent webinar funnel — standalone landing + registration + thank-you",
   "scripts": {
+    "clean:turbo": "rimraf .next/dev/cache/turbopack",
     "dev": "next dev -p 7002",
+    "dev:clean": "npm run clean:turbo && next dev -p 7002",
     "build": "next build",
     "start": "next start -p 7002",
     "lint": "eslint"
@@ -17,6 +19,7 @@
   },
   "devDependencies": {
     "eslint": "^9",
+    "rimraf": "^5.0.10",
     "eslint-config-next": "16.2.6"
   }
 }
