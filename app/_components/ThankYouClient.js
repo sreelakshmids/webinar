@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import styles from "./thankyou.module.css";
-import SiteFooter from "../SiteFooter";
+import SiteFooter from "./SiteFooter";
 import {
   CONFIG,
   WEBINAR_PATH,
@@ -12,13 +12,13 @@ import {
   formattedWebinarTime,
   webinarEndDate,
   webinarStartDate,
-} from "../config";
+} from "./config";
 import {
   captureAttribution,
   trackAddToCalendar,
   trackCtaClick,
   trackRegistrationComplete,
-} from "../tracking";
+} from "./tracking";
 
 // ── Calendar ──────────────────────────────────────────────────────────────
 // Built in the browser from CONFIG, so there is no server round trip and the

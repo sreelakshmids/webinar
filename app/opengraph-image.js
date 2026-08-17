@@ -3,11 +3,11 @@ import {
   CONFIG,
   formattedWebinarDate,
   formattedWebinarTime,
-} from "../config";
+} from "./_components/config";
 
 // Social card, generated at build time rather than shipped as a binary.
 //
-// The metadata used to point at /webinar/og-full-stack-roadmap.jpg, which was
+// The metadata used to point at a static og-full-stack-roadmap.jpg, which was
 // never created — so every share preview requested a 404. A file convention
 // route means Next wires the correct absolute URL into both the Open Graph and
 // Twitter tags itself, and the card can never drift from CONFIG the way a

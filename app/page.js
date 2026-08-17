@@ -1,4 +1,4 @@
-import WebinarLanding from "./WebinarLanding";
+import WebinarLanding from "./_components/WebinarLanding";
 import {
   CONFIG,
   WEBINAR_PATH,
@@ -7,7 +7,7 @@ import {
   webinarEndDate,
   webinarStartDate,
   SITE_ORIGIN,
-} from "../config";
+} from "./_components/config";
 
 const TITLE = `${CONFIG.title} — free live webinar | Zeminent`;
 const DESCRIPTION = `${CONFIG.subtitle} ${formattedWebinarDate()} at ${formattedWebinarTime()}. Free.`;

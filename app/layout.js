@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
-import { SITE_ORIGIN } from "./webinar/config";
-import Analytics from "./webinar/Analytics";
+import { SITE_ORIGIN } from "./_components/config";
+import Analytics from "./_components/Analytics";
 
 // The same three families the Zeminent learner site loads, exposed under the
 // same CSS variable names. webinar.module.css reads --font-geist-sans /

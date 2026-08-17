@@ -1,8 +1,8 @@
 // ── Webinar funnel configuration ───────────────────────────────────────────
 //
 // Single source of truth for the Full Stack Roadmap webinar funnel. The
-// landing page (/webinar/full-stack-roadmap) and the thank-you page
-// (/webinar/thank-you) both import from here, which is what keeps
+// landing page (/) and the thank-you page (/thank-you) both import from
+// here, which is what keeps
 // CONFIG.webinarStart identical across the two — the integration guide calls
 // that out as a manual step because the original build was two loose HTML
 // files; here it is structurally guaranteed.
@@ -20,7 +20,7 @@
 // how Zoho prefills its hidden fields.
 //
 // The form's own "On Successful Submission → Redirect to URL" must point at
-// https://learning.zeminent.com/webinar/thank-you.html — see THANK_YOU_PATH.
+// https://webinar.zeminent.com/thank-you — see THANK_YOU_PATH.
 const zohoFormUrl =
   process.env.NEXT_PUBLIC_ZOHO_FORM_URL ||
   "https://forms.zohopublic.in/prathyushazemi1/form/WebinarSignupForm/formperma/A7IfjywsvIuQlIebLy6GL6RFnqqBUYiRIyfb88u-mec";
@@ -83,18 +83,19 @@ export const CONFIG = {
   location: "Online · joining link emailed on registration",
 };
 
-// Canonical paths. The .html suffix on the thank-you page is preserved as a
-// rewrite in next.config.mjs because it is the URL configured inside Zoho
-// Forms, and changing it there means re-testing the whole submission flow.
-export const WEBINAR_PATH = "/webinar/full-stack-roadmap";
-export const THANK_YOU_PATH = "/webinar/thank-you";
+// Canonical paths. This app is its own site on its own domain, so the funnel
+// sits at the root — the old /webinar/full-stack-roadmap prefix only existed
+// because it used to be a route inside the learner app. The previous paths are
+// kept as redirects in next.config.mjs so any link already shared still works.
+export const WEBINAR_PATH = "/";
+export const THANK_YOU_PATH = "/thank-you";
 
 // This app's own public origin. Social cards, the canonical URL and the
 // Event JSON-LD all need absolute URLs, and only the deployment knows what
 // its own hostname is. The literal is the production fallback so a build
 // without the env var still emits real URLs rather than localhost.
 export const SITE_ORIGIN = (
-  process.env.NEXT_PUBLIC_WEBINAR_SITE_URL || "https://learning.zeminent.com"
+  process.env.NEXT_PUBLIC_WEBINAR_SITE_URL || "https://webinar.zeminent.com"
 ).replace(/\/+$/, "");
 
 // The main Zeminent learner site. This app used to live inside it, so what

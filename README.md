@@ -36,41 +36,42 @@ are *not yet* Zeminent learners. See **Authentication** below.
 
 ## Routes
 
+The funnel is the whole of this site, so it lives at the root.
+
 | URL | Serves |
 |---|---|
-| `/` | redirects to the landing page |
-| `/webinar/full-stack-roadmap` | landing page (canonical) |
-| `/webinar/thank-you` | thank-you page (`noindex`) |
-| `/webinar/thank-you.html` | thank-you page — **rewrite**; this is the URL configured inside Zoho Forms |
-| `/webinar`, `/full-stack-roadmap` | redirect to the landing page |
-| `/webinar/index.html`, `/webinar/full-stack-roadmap.html` | rewrites, for parity with the guide's static layout |
+| `/` | landing page (canonical) |
+| `/thank-you` | thank-you page (`noindex`) |
+| `/webinar/full-stack-roadmap`, `/webinar`, `/full-stack-roadmap`, `/index.html` | redirect to `/` |
+| `/webinar/thank-you`, `/webinar/thank-you.html`, `/thank-you.html` | redirect to `/thank-you` |
 
-The `/webinar/...` prefix is kept even though this app serves nothing else.
-Zoho Forms' success redirect, the CRM mapping and the webhook are all
-configured against those exact URLs, and the public link has been shared.
-Changing the paths would mean re-testing the whole submission chain for no
-gain; `/` redirects into it so `localhost:7002` still lands correctly.
+Those legacy paths date from when the funnel was a route subtree inside
+`zeminent-learn`. They are kept as redirects rather than deleted because the
+URLs have been shared and a 404 on a webinar link costs a registration.
 
 ## Files
 
 ```
 app/
-  layout.js                     fonts (Geist, Geist Mono, Fraunces) + favicons
+  layout.js                     fonts (Geist, Geist Mono, Fraunces) + favicons + GA4
   globals.css                   canvas + iOS input-zoom fix only
-  webinar/
+  page.js                       landing page — metadata, OG, Event JSON-LD
+  opengraph-image.js            social card, generated at build time
+  thank-you/page.js
+  _components/                  underscore = private folder, never a route
     config.js                   CONFIG — the only file with values to change
     tracking.js                 UTM capture (sessionStorage) + GA4 events
     Analytics.js                gtag; renders nothing without a real GA4 ID
-    WebinarChrome.js            top bar (back to Zeminent), footer, section label
+    WebinarChrome.js            top bar, section label
+    SiteFooter.js               site footer (ported from the learner app)
+    BrandIcons.js
     RegistrationModal.js        Zoho form iframe + focus trap + scroll lock
-    webinar.module.css          all styling, scoped to .page
-    full-stack-roadmap/
-      page.js                   metadata, OG, Event JSON-LD
-      WebinarLanding.js
-      content.js                page copy
-    thank-you/
-      page.js
-      ThankYouClient.js         registration_complete, .ics, calendar links
+    WebinarLanding.js
+    ThankYouClient.js           registration_complete, .ics, calendar links
+    content.js                  landing page copy
+    webinar.module.css          landing page styling, scoped to .page
+    thankyou.module.css         thank-you styling
+    footer.module.css
 
 scripts/sheets-webhook.gs       Apps Script receiver → Google Sheet → Power BI
 public/webinar/surya.png        instructor photo, served locally
@@ -82,7 +83,7 @@ stylesheet moved across from the learner app unchanged.
 
 ## Configuration
 
-Everything lives in `app/webinar/config.js`, each value overridable with a
+Everything lives in `app/_components/config.js`, each value overridable with a
 `NEXT_PUBLIC_*` variable — see `.env.example`.
 
 | CONFIG key | Env var |
@@ -175,7 +176,7 @@ a token handoff — rather than being bolted on here.
 Unchanged from `INTEGRATION-GUIDE.md` sections 1–4. Two things this code
 depends on:
 
-1. **Form redirect** → `<this app's origin>/webinar/thank-you.html`
+1. **Form redirect** → `<this app's origin>/thank-you`
 2. **Dark form theme** — background `#0d1117`, field background `#171c27`,
    border `rgba(255,255,255,.16)`, text `#E6EAF2`, button `#4F9CF9` with a
    `#08111C` label. The modal's background is `#0d1117`, so a white form
@@ -192,7 +193,7 @@ sketch.
 - [ ] `NEXT_PUBLIC_WEBINAR_URL` — Zoho Webinar session URL
 - [ ] `NEXT_PUBLIC_GA4_MEASUREMENT_ID` — the tag does not render until this is set
 - [ ] Hidden UTM fields added to the Zoho form
-- [ ] Zoho form redirect points at this app's `/webinar/thank-you.html`
+- [ ] Zoho form redirect points at this app's `/thank-you`
 - [ ] `CONFIG.instructor.bio` — Surya to read once before it ships
 - [ ] `CONFIG.testimonials` — real students only; leave empty until then
 - [ ] `SHEET_ID` and `SHARED_SECRET` in `scripts/sheets-webhook.gs`

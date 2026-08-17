@@ -17,23 +17,26 @@ const nextConfig = {
     '*.local',
   ],
   async redirects() {
-    return [
-      // The app's own root and the short paths people type or print on slides.
-      { source: '/', destination: '/webinar/full-stack-roadmap', permanent: false },
-      { source: '/webinar', destination: '/webinar/full-stack-roadmap', permanent: false },
-      { source: '/full-stack-roadmap', destination: '/webinar/full-stack-roadmap', permanent: false },
+    // The funnel now lives at the root of its own domain, so every path it
+    // used while nested inside the learner app is a legacy alias. Kept as
+    // redirects rather than deleted: those URLs have been shared, and a 404 on
+    // a webinar link costs a registration. `permanent: false` (307) because
+    // the shape may still move; switch to true once the address settles.
+    const LEGACY = [
+      '/webinar',
+      '/webinar/full-stack-roadmap',
+      '/webinar/full-stack-roadmap.html',
+      '/webinar/index.html',
+      '/full-stack-roadmap',
+      '/index.html',
     ];
-  },
-  async rewrites() {
     return [
-      // Zoho Forms' success redirect is configured as
-      // .../webinar/thank-you.html and the CRM + webhook flow is tested
-      // against that exact URL. Serving the route at that path — as a rewrite,
-      // so the address bar keeps it — means the split into a standalone app
-      // needs no change on the Zoho side.
-      { source: '/webinar/thank-you.html', destination: '/webinar/thank-you' },
-      { source: '/webinar/full-stack-roadmap.html', destination: '/webinar/full-stack-roadmap' },
-      { source: '/webinar/index.html', destination: '/webinar/full-stack-roadmap' },
+      ...LEGACY.map((source) => ({ source, destination: '/', permanent: false })),
+      // Thank-you aliases, including the .html form the integration guide
+      // told Zoho to use.
+      { source: '/webinar/thank-you', destination: '/thank-you', permanent: false },
+      { source: '/webinar/thank-you.html', destination: '/thank-you', permanent: false },
+      { source: '/thank-you.html', destination: '/thank-you', permanent: false },
     ];
   },
   async headers() {

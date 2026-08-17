@@ -1,5 +1,5 @@
-import ThankYouClient from "./ThankYouClient";
-import { CONFIG } from "../config";
+import ThankYouClient from "../_components/ThankYouClient";
+import { CONFIG } from "../_components/config";
 
 export const metadata = {
   title: `You're registered — ${CONFIG.title} | Zeminent`,

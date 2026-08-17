@@ -2,22 +2,22 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, Check, Minus } from "lucide-react";
-import styles from "../webinar.module.css";
-import RegistrationModal from "../RegistrationModal";
-import { SectionLabel, WebinarTopBar } from "../WebinarChrome";
-import SiteFooter from "../SiteFooter";
+import styles from "./webinar.module.css";
+import RegistrationModal from "./RegistrationModal";
+import { SectionLabel, WebinarTopBar } from "./WebinarChrome";
+import SiteFooter from "./SiteFooter";
 import {
   CONFIG,
   formattedWebinarDate,
   formattedWebinarTime,
   webinarStartDate,
-} from "../config";
+} from "./config";
 import {
   captureAttribution,
   initScrollDepthTracking,
   trackCtaClick,
   trackViewWebinarLanding,
-} from "../tracking";
+} from "./tracking";
 import {
   AUDIENCE_FOR,
   AUDIENCE_NOT_FOR,
