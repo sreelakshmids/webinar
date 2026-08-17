@@ -1,0 +1,1579 @@
+/* ── Full Stack Roadmap webinar — scoped styles ────────────────────────────
+ *
+ * A CSS module, so nothing here leaks into the rest of the app and nothing in
+ * globals.css needs to change. The token block is redeclared locally on
+ * `.page` rather than inherited from :root for two reasons:
+ *
+ *   1. The app has a light theme (html.light) and this funnel is dark-only.
+ *      The registration modal embeds a Zoho form themed dark on Zoho's side,
+ *      which cannot follow a client-side toggle — a light page around a dark
+ *      iframe is a worse seam than a consistently dark page.
+ *   2. It matches the precedent set by app/cohort-04/enroll, the other
+ *      standalone funnel page in this codebase.
+ *
+ * Values are the real zeminent.com brand tokens, not the integration guide's
+ * inferred ones: --bg #0d1117 is confirmed by the site's theme-color meta tag,
+ * and the accent is #5eead4 — the guide guessed #4D9FFF and explicitly asked
+ * for it to be swapped for the real brand colour. Change --wb-accent here and
+ * everything re-tints.
+ *
+ * Typography reuses the fonts already loaded by app/layout.js (Geist,
+ * Geist Mono, Fraunces) — the same trio the homepage uses, filling the same
+ * roles the guide describes for Inter Tight / JetBrains Mono / Instrument
+ * Serif. No extra webfont request.
+ */
+
+.page {
+  --wb-bg: #0d1117;
+  --wb-bg-1: #141a23;
+  --wb-bg-2: #161d27;
+  --wb-bg-3: #1c2531;
+  --wb-fg: #e8ecef;
+  --wb-fg-dim: #a8b0bb;
+  --wb-fg-mute: #6b7280;
+  --wb-border: rgba(255, 255, 255, 0.06);
+  --wb-border-strong: rgba(255, 255, 255, 0.18);
+  --wb-accent: #5eead4;
+  --wb-accent-2: #2dd4bf;
+  --wb-accent-dim: rgba(94, 234, 212, 0.16);
+  --wb-accent-wash: rgba(94, 234, 212, 0.04);
+  --wb-accent-glow: rgba(94, 234, 212, 0.35);
+
+  --wb-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --wb-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --wb-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+
+  --wb-shell: 1280px;
+  --wb-gutter: 24px;
+
+  background: var(--wb-bg);
+  color: var(--wb-fg);
+  font-family: var(--wb-sans);
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: clip;
+  color-scheme: dark;
+}
+
+.page *,
+.page *::before,
+.page *::after {
+  box-sizing: border-box;
+}
+
+.page ::selection {
+  background: var(--wb-accent);
+  color: #05080c;
+}
+
+/* ── Primitives ───────────────────────────────────────────────────────── */
+
+.shell {
+  max-width: var(--wb-shell);
+  margin: 0 auto;
+  padding-left: var(--wb-gutter);
+  padding-right: var(--wb-gutter);
+}
+
+.display {
+  font-family: var(--wb-serif);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+  margin: 0;
+}
+
+/* Italic serif emphasis inside headings — the homepage's signature device
+   (`Ship engineers, *not graduates.*`). */
+.em {
+  font-family: var(--wb-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--wb-accent);
+}
+
+.emMuted {
+  composes: em;
+  color: var(--wb-fg-dim);
+}
+
+.mono {
+  font-family: var(--wb-mono);
+  letter-spacing: -0.01em;
+}
+
+/* Monospace section eyebrow with a rule: `03 —— THE STACK` */
+.sectionLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.sectionLabelNum {
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--wb-fg-mute);
+}
+
+.sectionLabelRule {
+  width: 32px;
+  height: 1px;
+  background: var(--wb-border-strong);
+  flex-shrink: 0;
+}
+
+.sectionLabelText {
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wb-fg-dim);
+}
+
+.section {
+  border-top: 1px solid var(--wb-border);
+  padding-top: 112px;
+  padding-bottom: 112px;
+  position: relative;
+}
+
+.sectionHeading {
+  font-size: clamp(34px, 5vw, 68px);
+  line-height: 1.04;
+  max-width: 15ch;
+}
+
+.lede {
+  color: var(--wb-fg-dim);
+  font-size: 17px;
+  line-height: 1.7;
+  max-width: 62ch;
+}
+
+/* Tag pill — same geometry as components/ui/Tag.js */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--wb-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--wb-border);
+  color: var(--wb-fg-dim);
+  white-space: nowrap;
+}
+
+.tagAccent {
+  composes: tag;
+  border-color: var(--wb-accent-dim);
+  color: var(--wb-accent);
+  background: var(--wb-accent-wash);
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--wb-accent);
+  display: inline-block;
+  animation: wbPulse 2.2s ease-out infinite;
+}
+
+@keyframes wbPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(94, 234, 212, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(94, 234, 212, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(94, 234, 212, 0);
+  }
+}
+
+/* Buttons — pill geometry, accent fill, trailing arrow. Matches
+   .btn-primary / .btn-ghost in components/styles/globalStyles.js. */
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--wb-accent);
+  color: #05080c;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 14px 26px;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 0 0 0 var(--wb-accent-glow);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 32px 0 var(--wb-accent-glow);
+}
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--wb-fg);
+  font-family: inherit;
+  font-size: 15px;
+  border: 1px solid var(--wb-border-strong);
+  border-radius: 999px;
+  padding: 14px 22px;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.btnGhost:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.arrow {
+  transition: transform 0.18s ease;
+}
+
+.btnPrimary:hover .arrow,
+.btnGhost:hover .arrow {
+  transform: translateX(3px);
+}
+
+.page :is(a, button):focus-visible {
+  outline: 2px solid var(--wb-accent);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* Backgrounds carried over from the homepage hero */
+.gridBg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 92%);
+}
+
+.heroGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 80% 50% at 50% 0%,
+    rgba(94, 234, 212, 0.12),
+    transparent 60%
+  );
+}
+
+/* ── Top bar ──────────────────────────────────────────────────────────── */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 1px solid transparent;
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    backdrop-filter 0.3s ease;
+}
+
+.topbarScrolled {
+  background: rgba(13, 17, 23, 0.78);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom-color: var(--wb-border);
+}
+
+.topbarInner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 64px;
+}
+
+/* Wordmark + product label, pointing at this app's own landing page. One
+   target so it is a comfortable tap on a phone. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--wb-fg-dim);
+  flex-shrink: 0;
+}
+
+.brand:hover {
+  color: var(--wb-fg);
+}
+
+.brandDivider {
+  width: 1px;
+  height: 16px;
+  background: var(--wb-border-strong);
+  flex-shrink: 0;
+}
+
+.brandLabel {
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.logo {
+  height: 22px;
+  width: auto;
+  /* The wordmark PNG is dark monochrome — invert it for the dark canvas,
+     same treatment as .brand-logo in globals.css. */
+  filter: brightness(0) invert(1);
+}
+
+.topbarSpacer {
+  flex: 1;
+}
+
+.topbarMeta {
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  color: var(--wb-fg-mute);
+  white-space: nowrap;
+}
+
+.topbarCta {
+  padding: 9px 18px;
+  font-size: 13px;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  padding-top: 72px;
+  padding-bottom: 88px;
+}
+
+.heroInner {
+  position: relative;
+  display: grid;
+  gap: 56px;
+  align-items: start;
+}
+
+/* Sized to read like "Ship engineers, / not graduates." on the learner
+   homepage, not to match its raw px.
+
+   The learner sets clamp(56px, 8vw, 112px) — but it renders that inside a
+   ~630px half-width hero column, where 112px fills the measure. This hero is
+   full width since it stacked, so the same px sprawls across 1200px and reads
+   far louder than the original. Dropping the ceiling to 88px gives the two
+   headlines the same presence on screen. Letter-spacing and the italic serif
+   emphasis are copied from the learner exactly. */
+.heroTitle {
+  font-size: clamp(42px, 6.4vw, 88px);
+  letter-spacing: -0.025em;
+  line-height: 0.98;
+  margin-top: 28px;
+}
+
+.heroTitle span {
+  display: block;
+}
+
+.heroLede {
+  margin-top: 28px;
+  color: var(--wb-fg-dim);
+  font-size: 18px;
+  line-height: 1.6;
+  max-width: 46ch;
+}
+
+.heroActions {
+  margin-top: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.heroNote {
+  margin-top: 18px;
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  color: var(--wb-fg-mute);
+}
+
+/* Session card — the hero's right column. Deliberately echoes the homepage's
+   `hero.tsx` editor panel: window chrome, hairline rows, status bar. */
+.sessionCard {
+  position: relative;
+  /* Capped and left-aligned under the copy. Stretched to the full 1280px
+     shell the label/value rows would sit at opposite ends of the screen with
+     a void between them, which is unreadable — this keeps each row scannable
+     as a pair. */
+  width: 100%;
+  max-width: 780px;
+  border: 1px solid var(--wb-border-strong);
+  background: var(--wb-bg-1);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 30px 80px -20px rgba(0, 0, 0, 0.7);
+}
+
+.sessionChrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--wb-border);
+  font-family: var(--wb-mono);
+  font-size: 11px;
+  color: var(--wb-fg-mute);
+}
+
+.sessionDots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sessionDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #2d3a4d;
+}
+
+.sessionBody {
+  padding: 26px 24px 8px;
+  background: linear-gradient(
+    180deg,
+    rgba(94, 234, 212, 0.03) 0%,
+    transparent 34%
+  );
+}
+
+.sessionRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px dashed var(--wb-border);
+}
+
+.sessionRow:last-child {
+  border-bottom: none;
+}
+
+.sessionKey {
+  font-family: var(--wb-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wb-fg-mute);
+  flex-shrink: 0;
+}
+
+.sessionVal {
+  font-size: 15px;
+  color: var(--wb-fg);
+  text-align: right;
+}
+
+.sessionValAccent {
+  composes: sessionVal;
+  color: var(--wb-accent);
+}
+
+.sessionFoot {
+  padding: 16px 24px 22px;
+}
+
+.sessionStatus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--wb-border);
+  font-family: var(--wb-mono);
+  font-size: 11px;
+  color: var(--wb-fg-mute);
+}
+
+.sessionCta {
+  width: 100%;
+}
+
+/* Countdown, rendered client-side only */
+.countdown {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.countdownUnit {
+  flex: 1;
+  border: 1px solid var(--wb-border);
+  border-radius: 10px;
+  background: var(--wb-bg-2);
+  padding: 10px 6px;
+  text-align: center;
+}
+
+.countdownNum {
+  font-family: var(--wb-mono);
+  font-size: 22px;
+  letter-spacing: -0.03em;
+  color: var(--wb-fg);
+  font-variant-numeric: tabular-nums;
+}
+
+.countdownLabel {
+  font-family: var(--wb-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wb-fg-mute);
+  margin-top: 4px;
+}
+
+/* ── Fact strip ───────────────────────────────────────────────────────── */
+
+.factStrip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--wb-border-strong);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.factCell {
+  padding: 22px 24px;
+  border-bottom: 1px solid var(--wb-border);
+  border-right: 1px solid var(--wb-border);
+}
+
+.factCell:nth-child(2n) {
+  border-right: none;
+}
+
+.factCell:nth-last-child(-n + 2) {
+  border-bottom: none;
+}
+
+.factKey {
+  font-family: var(--wb-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wb-fg-mute);
+}
+
+.factVal {
+  margin-top: 8px;
+  font-size: 17px;
+  color: var(--wb-fg);
+}
+
+/* ── Numbered capability grid (01 / 07) ───────────────────────────────── */
+
+.capGrid {
+  margin-top: 64px;
+  display: grid;
+  grid-template-columns: 1fr;
+  border: 1px solid var(--wb-border-strong);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.capCell {
+  padding: 34px 30px;
+  border-bottom: 1px solid var(--wb-border);
+  border-right: 1px solid var(--wb-border);
+  background: transparent;
+  transition: background 0.25s ease;
+}
+
+.capCell:hover {
+  background: var(--wb-bg-1);
+}
+
+/* Seven cells never fill the last row evenly at any column count, so the
+   final cell would otherwise trail a border into empty space. Declared in the
+   base layer; the per-breakpoint nth-child rules below only ever re-add
+   borders to even/third cells, and 7 is neither. */
+.capCell:last-child {
+  border-right: none;
+  border-bottom: none;
+}
+
+.capIndex {
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--wb-fg-mute);
+}
+
+.capIndexCurrent {
+  color: var(--wb-accent);
+}
+
+.capTitle {
+  margin: 16px 0 0;
+  font-family: var(--wb-serif);
+  font-size: 27px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+
+.capBody {
+  margin-top: 12px;
+  color: var(--wb-fg-dim);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.capTags {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ── Tech chips ───────────────────────────────────────────────────────── */
+
+.chipRows {
+  margin-top: 56px;
+  display: grid;
+  gap: 28px;
+}
+
+.chipRow {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+  padding-bottom: 24px;
+  border-bottom: 1px dashed var(--wb-border);
+}
+
+.chipRowLabel {
+  font-family: var(--wb-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wb-fg-mute);
+  padding-top: 5px;
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  letter-spacing: -0.01em;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--wb-border);
+  background: var(--wb-bg-2);
+  color: var(--wb-fg-dim);
+}
+
+/* ── Audience list ────────────────────────────────────────────────────── */
+
+.audienceGrid {
+  margin-top: 56px;
+  display: grid;
+  gap: 40px;
+}
+
+.audienceCol h3 {
+  font-family: var(--wb-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wb-fg-mute);
+  margin: 0 0 20px;
+  font-weight: 400;
+}
+
+.audienceList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.audienceItem {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 15px 0;
+  border-top: 1px solid var(--wb-border);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--wb-fg-dim);
+}
+
+.audienceItem strong {
+  color: var(--wb-fg);
+  font-weight: 500;
+}
+
+.audienceIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--wb-accent);
+}
+
+.audienceIconMuted {
+  composes: audienceIcon;
+  color: var(--wb-fg-mute);
+}
+
+/* ── Instructor ───────────────────────────────────────────────────────── */
+
+.instructor {
+  margin-top: 56px;
+  display: grid;
+  gap: 40px;
+  align-items: start;
+}
+
+.instructorPhotoWrap {
+  position: relative;
+  border: 1px solid var(--wb-border-strong);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--wb-bg-2);
+  aspect-ratio: 1 / 1;
+  max-width: 340px;
+}
+
+.instructorPhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.instructorName {
+  font-family: var(--wb-serif);
+  font-size: 40px;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  margin: 0;
+  font-weight: 400;
+}
+
+.instructorRole {
+  margin-top: 10px;
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--wb-accent);
+}
+
+.instructorBio {
+  margin-top: 22px;
+  color: var(--wb-fg-dim);
+  font-size: 17px;
+  line-height: 1.7;
+  max-width: 60ch;
+}
+
+.instructorFacts {
+  margin-top: 26px;
+  list-style: none;
+  padding: 0;
+}
+
+.instructorFact {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-top: 1px solid var(--wb-border);
+  color: var(--wb-fg-dim);
+  font-size: 15px;
+}
+
+/* ── Stat strip ───────────────────────────────────────────────────────── */
+
+.statStrip {
+  margin-top: 56px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--wb-border-strong);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.statCell {
+  padding: 30px 26px;
+  border-right: 1px solid var(--wb-border);
+  border-bottom: 1px solid var(--wb-border);
+}
+
+.statCell:nth-child(2n) {
+  border-right: none;
+}
+
+.statCell:nth-last-child(-n + 2) {
+  border-bottom: none;
+}
+
+.statCellShaded {
+  background: var(--wb-bg-1);
+}
+
+.statNum {
+  font-family: var(--wb-mono);
+  font-size: clamp(30px, 4.4vw, 44px);
+  letter-spacing: -0.04em;
+  color: var(--wb-fg);
+}
+
+.statLabel {
+  margin-top: 8px;
+  font-family: var(--wb-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wb-fg-mute);
+}
+
+/* ── Takeaways ────────────────────────────────────────────────────────── */
+
+.takeaways {
+  margin-top: 56px;
+  display: grid;
+  gap: 0;
+}
+
+.takeaway {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 22px 0;
+  border-top: 1px solid var(--wb-border);
+}
+
+.takeawayNum {
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--wb-fg-mute);
+  padding-top: 4px;
+  flex-shrink: 0;
+  width: 34px;
+}
+
+.takeawayText {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--wb-fg-dim);
+  max-width: 70ch;
+}
+
+.takeawayText strong {
+  color: var(--wb-fg);
+  font-weight: 500;
+}
+
+/* ── Testimonials (rendered only when CONFIG.testimonials is non-empty) ── */
+
+.quoteList {
+  margin-top: 56px;
+  display: grid;
+  gap: 72px;
+}
+
+.quote {
+  max-width: 980px;
+  margin: 0;
+}
+
+.quoteAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #161d27, #1c2531);
+  border: 1px solid var(--wb-border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--wb-serif);
+  font-size: 22px;
+}
+
+.quoteText {
+  margin-top: 24px;
+  font-family: var(--wb-serif);
+  font-size: clamp(21px, 2.4vw, 31px);
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+}
+
+.quoteMark {
+  font-family: var(--wb-serif);
+  font-style: italic;
+  color: var(--wb-accent);
+}
+
+.quoteFooter {
+  margin-top: 22px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.quoteName {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.quoteRole {
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  color: var(--wb-fg-mute);
+}
+
+/* ── Final CTA ────────────────────────────────────────────────────────── */
+
+.finalCta {
+  border-top: 1px solid var(--wb-border);
+  padding: 120px 0 128px;
+  text-align: center;
+  background: radial-gradient(
+    ellipse 60% 100% at 50% 100%,
+    rgba(94, 234, 212, 0.1),
+    transparent 70%
+  );
+}
+
+.finalHeading {
+  font-size: clamp(40px, 7.4vw, 104px);
+  line-height: 0.99;
+  margin-top: 28px;
+}
+
+.finalLede {
+  margin: 26px auto 0;
+  color: var(--wb-fg-dim);
+  font-size: 18px;
+  line-height: 1.6;
+  max-width: 52ch;
+}
+
+.finalActions {
+  margin-top: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.finalMeta {
+  margin-top: 26px;
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  color: var(--wb-fg-mute);
+}
+
+/* ── Seat bar ─────────────────────────────────────────────────────────── */
+
+/* Appears once the hero CTA has scrolled away, so the primary action is
+   never more than a thumb-reach away on a phone. Hidden while the modal is
+   open so it can't overlay the form. */
+.seatBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 25;
+  border-top: 1px solid var(--wb-border-strong);
+  background: rgba(13, 17, 23, 0.92);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  padding: 12px var(--wb-gutter);
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  transform: translateY(110%);
+  transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.seatBarVisible {
+  transform: translateY(0);
+}
+
+.seatBarInner {
+  max-width: var(--wb-shell);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.seatBarCopy {
+  min-width: 0;
+  flex: 1;
+}
+
+.seatBarTitle {
+  font-size: 14px;
+  color: var(--wb-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.seatBarMeta {
+  font-family: var(--wb-mono);
+  font-size: 11px;
+  color: var(--wb-fg-mute);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.seatBarCta {
+  flex-shrink: 0;
+  padding: 11px 20px;
+  font-size: 14px;
+}
+
+/* ── Registration modal ───────────────────────────────────────────────── */
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(5, 8, 12, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: wbFade 0.18s ease both;
+}
+
+@keyframes wbFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  /* dvh, not vh: mobile browsers shrink the visual viewport when the URL bar
+     is showing, and a vh-sized sheet puts the form's submit button under it. */
+  height: 92dvh;
+  max-height: 92dvh;
+  background: #0d1117;
+  border: 1px solid var(--wb-border-strong);
+  border-bottom: none;
+  border-radius: 18px 18px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: wbSheetUp 0.26s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes wbSheetUp {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--wb-border);
+  flex-shrink: 0;
+}
+
+.modalTitle {
+  font-family: var(--wb-serif);
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0;
+  font-weight: 400;
+}
+
+.modalMeta {
+  margin-top: 6px;
+  font-family: var(--wb-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--wb-fg-mute);
+}
+
+.modalClose {
+  margin-left: auto;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--wb-border);
+  background: transparent;
+  color: var(--wb-fg-dim);
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.modalClose:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--wb-fg);
+}
+
+.modalBody {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  /* Matches the Zoho form's own dark theme background (#0d1117) so there is
+     no seam where the iframe starts. */
+  background: #0d1117;
+}
+
+.modalFrame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: #0d1117;
+}
+
+/* Shown until the iframe's load event fires — without it the modal is a
+   black rectangle for as long as Zoho takes to respond. */
+.modalLoading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  align-content: center;
+  background: #0d1117;
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--wb-fg-mute);
+  pointer-events: none;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 2px solid var(--wb-border-strong);
+  border-top-color: var(--wb-accent);
+  animation: wbSpin 0.8s linear infinite;
+}
+
+@keyframes wbSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.modalFallback {
+  padding: 14px 22px;
+  border-top: 1px solid var(--wb-border);
+  font-size: 13px;
+  color: var(--wb-fg-mute);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.modalFallback a {
+  color: var(--wb-accent);
+  text-decoration: none;
+}
+
+.modalFallback a:hover {
+  text-decoration: underline;
+}
+
+/* ── Thank-you page ───────────────────────────────────────────────────── */
+
+.tyMain {
+  position: relative;
+  padding: 80px 0 96px;
+}
+
+.tyCheck {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--wb-accent-dim);
+  background: var(--wb-accent-wash);
+  color: var(--wb-accent);
+}
+
+.tyHeading {
+  font-size: clamp(40px, 7vw, 92px);
+  line-height: 0.99;
+  margin-top: 28px;
+}
+
+.tyLede {
+  margin-top: 26px;
+  color: var(--wb-fg-dim);
+  font-size: 18px;
+  line-height: 1.65;
+  max-width: 54ch;
+}
+
+.tyPanel {
+  margin-top: 48px;
+  border: 1px solid var(--wb-border-strong);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--wb-bg-1);
+}
+
+.tyPanelHead {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--wb-border);
+  font-family: var(--wb-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wb-fg-mute);
+}
+
+.tyPanelBody {
+  padding: 8px 24px 24px;
+}
+
+.tyActions {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tyNext {
+  margin-top: 64px;
+  display: grid;
+  gap: 0;
+}
+
+.tyStep {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 22px 0;
+  border-top: 1px solid var(--wb-border);
+}
+
+.tyStepNum {
+  font-family: var(--wb-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--wb-fg-mute);
+  padding-top: 3px;
+  width: 34px;
+  flex-shrink: 0;
+}
+
+.tyStepBody h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--wb-fg);
+}
+
+.tyStepBody p {
+  margin: 8px 0 0;
+  color: var(--wb-fg-dim);
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 62ch;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+
+/* Phones: the layout is rebuilt rather than shrunk. Section padding halves,
+   the fact strip and stat strip drop to a single column so numbers keep their
+   scale, the hero CTA goes full-width, and the modal becomes a full-height
+   sheet. */
+@media (max-width: 599px) {
+  .page {
+    --wb-gutter: 18px;
+  }
+
+  .section {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .sectionLabel {
+    margin-bottom: 28px;
+  }
+
+  .sectionHeading {
+    max-width: none;
+  }
+
+  .hero {
+    padding-top: 44px;
+    padding-bottom: 56px;
+  }
+
+  .heroInner {
+    gap: 40px;
+  }
+
+  .heroActions .btnPrimary,
+  .heroActions .btnGhost,
+  .finalActions .btnPrimary,
+  .finalActions .btnGhost,
+  .tyActions .btnPrimary,
+  .tyActions .btnGhost {
+    width: 100%;
+  }
+
+  .factStrip,
+  .statStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .factCell,
+  .statCell {
+    border-right: none;
+  }
+
+  .factCell:nth-last-child(-n + 2),
+  .statCell:nth-last-child(-n + 2) {
+    border-bottom: 1px solid var(--wb-border);
+  }
+
+  .factCell:last-child,
+  .statCell:last-child {
+    border-bottom: none;
+  }
+
+  .capCell {
+    padding: 26px 22px;
+  }
+
+  .finalCta {
+    padding: 72px 0 80px;
+  }
+
+  .quoteList {
+    gap: 48px;
+  }
+
+  .modal {
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+  }
+
+  .modalHeader {
+    padding: 16px 18px 14px;
+  }
+
+  .modalTitle {
+    font-size: 20px;
+  }
+
+  /* The topbar CTA duplicates the seat bar on a phone and squeezes the
+     back-to-Zeminent target — drop it and let the seat bar carry the action. */
+  .topbarCta,
+  .topbarMeta {
+    display: none;
+  }
+
+  .seatBarMeta {
+    display: none;
+  }
+
+  .tyMain {
+    padding: 48px 0 64px;
+  }
+}
+
+/* Small tablets and up */
+@media (min-width: 600px) {
+  .factStrip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .factCell {
+    border-bottom: none;
+  }
+
+  .factCell:nth-child(2n) {
+    border-right: 1px solid var(--wb-border);
+  }
+
+  .factCell:last-child {
+    border-right: none;
+  }
+
+  .statStrip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .statCell {
+    border-bottom: none;
+  }
+
+  .statCell:nth-child(2n) {
+    border-right: 1px solid var(--wb-border);
+  }
+
+  .statCell:last-child {
+    border-right: none;
+  }
+
+  .capGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .capCell:nth-child(2n) {
+    border-right: none;
+  }
+
+  .chipRow {
+    grid-template-columns: 150px 1fr;
+    gap: 24px;
+  }
+
+  .audienceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 48px;
+  }
+
+  .instructor {
+    grid-template-columns: 300px 1fr;
+    gap: 48px;
+  }
+}
+
+/* Laptops and desktops */
+@media (min-width: 1024px) {
+  .page {
+    --wb-gutter: 32px;
+  }
+
+  .section {
+    padding-top: 128px;
+    padding-bottom: 128px;
+  }
+
+  .hero {
+    padding-top: 88px;
+    padding-bottom: 112px;
+  }
+
+  /* Stacked, not side by side, at every width — copy first, then the session
+     table beneath it. Reading top-to-bottom keeps the headline at full scale
+     instead of squeezing it into half the viewport, and it matches how the
+     learner site sequences a section: statement, then the supporting block. */
+  .heroInner {
+    gap: 64px;
+  }
+
+  .capGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Reset the 2-column rule, then re-cut the right borders for 3 columns.
+     The last cell keeps the base rule's no-border treatment either way. */
+  .capCell:nth-child(2n) {
+    border-right: 1px solid var(--wb-border);
+  }
+
+  .capCell:nth-child(3n) {
+    border-right: none;
+  }
+
+  .instructor {
+    grid-template-columns: 340px 1fr;
+    gap: 64px;
+  }
+
+  .modalBackdrop {
+    align-items: center;
+    padding: 24px;
+  }
+
+  .modal {
+    height: min(860px, 88vh);
+    max-height: 88vh;
+    border-radius: 18px;
+    border-bottom: 1px solid var(--wb-border-strong);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page *,
+  .page *::before,
+  .page *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

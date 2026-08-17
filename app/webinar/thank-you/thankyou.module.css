@@ -1,0 +1,418 @@
+/* ── Thank-you page ────────────────────────────────────────────────────────
+ *
+ * Its own module with its own tokens, deliberately separate from
+ * webinar.module.css.
+ *
+ * This page follows the blue-accent confirmation design rather than the
+ * landing page's teal. That is an intentional divergence, chosen after being
+ * shown the two side by side — but it does mean the accent here (#4F9CF9,
+ * the integration guide's original value) is not the accent on the landing
+ * page or the learner site (#5eead4). Keeping the tokens in a separate file
+ * makes that split explicit instead of hiding it behind an override.
+ *
+ * Layout is a single centred card rather than the landing page's full-bleed
+ * sections: after registering there is one thing to read, so the page stops
+ * being a document and becomes a receipt.
+ */
+
+.page {
+  --ty-bg: #0d1117;
+  --ty-card: #111820;
+  --ty-panel: #161e27;
+  --ty-fg: #e8edf4;
+  --ty-dim: #9aa6b8;
+  --ty-mute: #6b7280;
+  --ty-border: rgba(255, 255, 255, 0.08);
+  --ty-border-strong: rgba(255, 255, 255, 0.16);
+  --ty-accent: #4f9cf9;
+  --ty-accent-soft: rgba(79, 156, 249, 0.14);
+  --ty-ok: #34d399;
+
+  --ty-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --ty-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --ty-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+
+  min-height: 100vh;
+  background: var(--ty-bg);
+  color: var(--ty-fg);
+  font-family: var(--ty-sans);
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  color-scheme: dark;
+}
+
+.page *,
+.page *::before,
+.page *::after {
+  box-sizing: border-box;
+}
+
+.page ::selection {
+  background: var(--ty-accent);
+  color: #05080c;
+}
+
+.page a:focus-visible,
+.page button:focus-visible {
+  outline: 2px solid var(--ty-accent);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────── */
+
+.header {
+  padding: 28px 24px 0;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: var(--ty-mute);
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+.headerInner {
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+.logo {
+  height: 22px;
+  width: auto;
+  /* Dark monochrome PNG — inverted for the dark canvas, same treatment the
+     learner app gives it. */
+  filter: brightness(0) invert(1);
+}
+
+.brandDivider {
+  width: 1px;
+  height: 18px;
+  background: var(--ty-border-strong);
+}
+
+.brandLabel {
+  font-family: var(--ty-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────── */
+
+.main {
+  flex: 1;
+  padding: 28px 24px 40px;
+}
+
+.card {
+  max-width: 940px;
+  margin: 0 auto;
+  background: var(--ty-card);
+  border: 1px solid var(--ty-border);
+  border-radius: 20px;
+  padding: 48px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ty-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ty-mute);
+}
+
+.okDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ty-ok);
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.14);
+}
+
+/* Bold sans lead-in, italic serif emphasis in the accent — the confirmation
+   headline treatment from the reference design. */
+.heading {
+  margin: 22px 0 0;
+  font-size: clamp(38px, 6vw, 54px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+}
+
+.headingEm {
+  font-family: var(--ty-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--ty-accent);
+}
+
+.lede {
+  margin: 20px 0 0;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--ty-dim);
+  max-width: 58ch;
+}
+
+.lede em {
+  font-style: normal;
+  color: var(--ty-accent);
+}
+
+/* ── Detail panel ─────────────────────────────────────────────────────── */
+
+.panel {
+  margin-top: 36px;
+  border: 1px solid var(--ty-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--ty-panel);
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--ty-border);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.rowKey {
+  font-family: var(--ty-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ty-mute);
+  flex-shrink: 0;
+}
+
+.rowVal {
+  font-size: 17px;
+  font-weight: 500;
+  text-align: right;
+  color: var(--ty-fg);
+}
+
+.rowValAccent {
+  color: var(--ty-accent);
+  font-weight: 400;
+}
+
+/* ── Actions ──────────────────────────────────────────────────────────── */
+
+.actions {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 26px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: #eef1f5;
+  color: #0d1117;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-1px);
+  background: #ffffff;
+}
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 24px;
+  border-radius: 12px;
+  border: 1px solid var(--ty-border-strong);
+  background: transparent;
+  color: var(--ty-fg);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.btnGhost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.arrow {
+  transition: transform 0.18s ease;
+}
+
+.btnPrimary:hover .arrow {
+  transform: translateX(3px);
+}
+
+/* Quiet escape hatch for people not on Google Calendar. Not in the reference
+   design, but dropping it would leave every Outlook and Apple Calendar user
+   with no way to save the session. */
+.icsLink {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--ty-mute);
+}
+
+.icsLink a {
+  color: var(--ty-dim);
+  text-underline-offset: 3px;
+}
+
+.icsLink a:hover {
+  color: var(--ty-fg);
+}
+
+/* ── Before the session ───────────────────────────────────────────────── */
+
+.divider {
+  margin: 40px 0 0;
+  height: 1px;
+  background: var(--ty-border);
+  border: none;
+}
+
+.stepsTitle {
+  margin: 32px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.steps {
+  margin: 20px 0 0;
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 20px;
+}
+
+.step {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.stepNum {
+  font-family: var(--ty-mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--ty-accent);
+  padding-top: 3px;
+  flex-shrink: 0;
+  width: 22px;
+}
+
+.stepText {
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: var(--ty-dim);
+  max-width: 66ch;
+}
+
+.fallback {
+  margin: 32px 0 0;
+  font-size: 15px;
+  color: var(--ty-mute);
+}
+
+.fallback a {
+  color: var(--ty-accent);
+  text-decoration: none;
+}
+
+.fallback a:hover {
+  text-decoration: underline;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+
+@media (max-width: 599px) {
+  .header {
+    padding: 20px 16px 0;
+  }
+
+  .main {
+    padding: 20px 16px 32px;
+  }
+
+  /* Edge-to-edge on a phone: a 48px inset card inside a 16px gutter wastes
+     half the width on a 360px screen. */
+  .card {
+    padding: 28px 20px;
+    border-radius: 16px;
+  }
+
+  .heading {
+    font-size: 34px;
+  }
+
+  .lede {
+    font-size: 16.5px;
+  }
+
+  .row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 16px 18px;
+  }
+
+  .rowVal {
+    text-align: left;
+    font-size: 16px;
+  }
+
+  .actions .btnPrimary,
+  .actions .btnGhost {
+    width: 100%;
+  }
+
+  .step {
+    gap: 16px;
+  }
+
+  .stepText {
+    font-size: 15.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page * {
+    transition-duration: 0.001ms !important;
+  }
+}

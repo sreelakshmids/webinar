@@ -1,0 +1,62 @@
+/* Minimal global layer only.
+ *
+ * Everything that styles the funnel lives in app/webinar/webinar.module.css,
+ * scoped to `.page`. This file exists to paint the canvas before that module
+ * mounts (so there is no white flash on a slow connection) and to carry the
+ * two global concerns a CSS module cannot express: the iOS input-zoom fix and
+ * the scrollbar treatment. Both are lifted verbatim from the learner app's
+ * globals.css so the two sites behave identically.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0d1117;
+  color: #e8ecef;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+::-webkit-scrollbar-thumb {
+  background: #1c2531;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2d3a4d;
+}
+
+/* iOS Safari force-zooms whenever a focused input's font-size is under 16px
+   and never zooms back out. The Zoho form runs in a cross-origin iframe and
+   sets its own sizes, but any input this app renders itself is covered here. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
