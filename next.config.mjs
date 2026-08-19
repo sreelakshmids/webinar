@@ -77,7 +77,11 @@ const nextConfig = {
               // is specified at all, anything not listed here is blocked —
               // which shows up as a CSP violation on every page load in dev.
               // Harmless in production, where the app frames only Zoho.
-              "frame-src 'self' https://forms.zohopublic.in https://*.zoho.in https://*.zoho.com https://*.zohowebinar.in",
+              // googletagmanager is here for GTM's <noscript> iframe
+              // (ns.html). Without it that fallback is blocked outright, and
+              // silently — a CSP violation in a browser with JS disabled is
+              // not something anyone is watching for.
+              "frame-src 'self' https://www.googletagmanager.com https://forms.zohopublic.in https://*.zoho.in https://*.zoho.com https://*.zohowebinar.in",
               `script-src 'self' 'unsafe-inline'${devScript} https://www.googletagmanager.com`,
               `connect-src 'self'${devConnect} https://www.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com`,
               `img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com${

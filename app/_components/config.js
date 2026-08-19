@@ -53,6 +53,21 @@ export const GA4_MEASUREMENT_ID =
 
 export const GA4_ENABLED = /^G-[A-Z0-9]{6,}$/.test(GA4_MEASUREMENT_ID);
 
+// ── Google Tag Manager ─────────────────────────────────────────────────────
+//
+// Separate from the gtag.js tag above. GTM is a container: tags are added and
+// removed in its web UI without a deploy, which is the point of having it.
+//
+// Both run side by side. If the GTM container is ever given a GA4
+// configuration tag for G-D4XJJ21J86, that property will receive two of
+// everything — one from gtag.js here, one from the container. Consolidate on
+// one or the other before that happens.
+export const GTM_CONTAINER_ID =
+  process.env.NEXT_PUBLIC_GTM_CONTAINER_ID || "GTM-MD93JBWX";
+
+export const GTM_ENABLED = /^GTM-[A-Z0-9]{4,}$/.test(GTM_CONTAINER_ID);
+
+
 // ── Session helpers ────────────────────────────────────────────────────────
 //
 // Each takes the session fetched from the admin API. They return null/"" for a

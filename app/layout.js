@@ -2,6 +2,9 @@ import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 import { SITE_ORIGIN } from "./_components/config";
 import Analytics from "./_components/Analytics";
+import GoogleTagManager, {
+  GoogleTagManagerNoScript,
+} from "./_components/GoogleTagManager";
 
 // The same three families the Zeminent learner site loads, exposed under the
 // same CSS variable names. webinar.module.css reads --font-geist-sans /
@@ -70,6 +73,10 @@ export default function RootLayout({ children }) {
       style={{ colorScheme: "dark" }}
     >
       <body>
+        {/* GTM's noscript iframe must be the first thing in <body> and must be
+            server-rendered — its audience has JavaScript off. */}
+        <GoogleTagManagerNoScript />
+        <GoogleTagManager />
         <Analytics />
         {children}
       </body>
