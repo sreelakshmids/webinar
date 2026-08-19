@@ -17,7 +17,19 @@ import "server-only";
 //   - Pages stay static. ISR revalidates in the background on a timer rather
 //     than blocking a request on the database.
 
-const API_URL = (process.env.API_URL || "http://localhost:4000/api").replace(/\/+$/, "");
+const API_URL = (process.env.API_URL || "http://localhost:7002/api").replace(/\/+$/, "");
+
+function publicAssetUrl(url) {
+  if (!url) return url;
+  try {
+    return url.replace(
+      /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/,
+      new URL(API_URL).origin,
+    );
+  } catch {
+    return url;
+  }
+}
 
 // How long a rendered page may be stale. Short enough that an admin saving a
 // date sees it on the next refresh-ish, long enough that traffic spikes don't
@@ -58,7 +70,9 @@ export async function getSession() {
       seatCap: webinar.seatCap || 0,
       priceLabel: webinar.priceLabel || "",
       location: webinar.location || "",
-      instructor: webinar.instructor || null,
+      instructor: webinar.instructor
+        ? { ...webinar.instructor, photo: publicAssetUrl(webinar.instructor.photo) }
+        : null,
       // Real students only. Empty means the section does not render at all.
       testimonials: Array.isArray(webinar.testimonials) ? webinar.testimonials : [],
       hasEnded: Boolean(webinar.hasEnded),

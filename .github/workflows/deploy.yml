@@ -1,0 +1,36 @@
+name: Deploy to production
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-zeminent-webinar
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check the server is reachable
+        run: |
+          if [ -z "${{ secrets.SSH_HOST }}" ]; then
+            echo "SSH_HOST is not set — check the repository secrets."
+            exit 1
+          fi
+          nc -z -w 10 "${{ secrets.SSH_HOST }}" 22 \
+            || { echo "Cannot reach ${{ secrets.SSH_HOST }} on port 22."; exit 1; }
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script_stop: true
+          command_timeout: 15m
+          script: |
+            export GIT_TERMINAL_PROMPT=0
+            export DEBIAN_FRONTEND=noninteractive
+            bash /home/deploy/apps/zeminent/learning/deploy/deploy.sh zeminent-webinar < /dev/null
