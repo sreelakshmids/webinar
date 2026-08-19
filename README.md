@@ -2,7 +2,7 @@
 
 Standalone Next.js app for the Zeminent webinar funnel — landing page,
 registration modal and thank-you page. Split out of `zeminent-learn`, where it
-originally shipped as a route subtree. 
+originally shipped as a route subtree.
 
 ```bash
 cd zeminent-webinar
